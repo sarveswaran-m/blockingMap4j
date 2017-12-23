@@ -78,6 +78,7 @@ import java.util.concurrent.TimeUnit;
  * @param <V> the type of mapped values
  * @author Sarveswaran M
  * @version 1.1, Semantics & contracts for a blocking map defined
+ * @version 1.2, Semantics & contracts reviewed
  */
 public interface BlockingMap<K, V> extends Map<K, V> {
 

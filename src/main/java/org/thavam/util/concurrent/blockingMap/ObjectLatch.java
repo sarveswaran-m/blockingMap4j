@@ -16,9 +16,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * <H1>A Blocking Object Latch</H1> This class implements a blocking object
  * latch, that acts as a synchronizer between a producer of an object and it's
- * consumer(s). <p> An object is set with
- * <code>set()</code>only ONCE. Further attempts to set the object are just
- * ignored.<br> Consumers request the object with
+ * consumer(s).
+ * <p>
+ * An object is set with <code>set()</code>only ONCE. Further attempts to set
+ * the object are just ignored.<br> Consumers request the object with
  * <code>get()</code>. If the object is not already set, consumers are blocked
  * waiting until the object is available or until an interrupt
  * (InteruptedException) terminates the wait. The map can be tested for object
@@ -32,19 +33,20 @@ class ObjectLatch<R> {
 
     /**
      * The object.
-     */
-    /*
-     * ==> object is set and got on different threads should be volatile,to get
-     * rid of caching issues
+     *
+     *
+     * object is set and got on different threads. Should be volatile,to get rid
+     * of caching issues
      */
     private volatile R object = null;
+    
     /**
      * The latch counter created and set to 1.
      */
     private final CountDownLatch latch = new CountDownLatch(1);
 
     /*
-     * isAvailable() & set(R object)form a critical section lock required to
+     * isAvailable() & set(R object)form a critical section. Lock required to
      * co-ordinate these sections
      */
     private final ReadWriteLock setLock = new ReentrantReadWriteLock();
@@ -69,7 +71,8 @@ class ObjectLatch<R> {
      * product from the same or different consumer. It should be consumed by a
      * consumer before another product with the same key can be put on the map
      *
-     * @return  null if mapping object set on latch, else returns the existing object in latch
+     * @return null if mapping object set on latch, else returns the existing
+     * object in latch
      * @param object the object
      */
     public R set(R object) {
@@ -83,7 +86,7 @@ class ObjectLatch<R> {
 //        } finally {
 //            setLock.writeLock().unlock();
 //        }
-        
+
         //version 2
         setLock.writeLock().lock();
         try {
@@ -91,7 +94,7 @@ class ObjectLatch<R> {
                 this.object = object;
                 latch.countDown();
                 return null;
-            } else{
+            } else {
                 return this.object;
             }
         } finally {
@@ -100,23 +103,25 @@ class ObjectLatch<R> {
     }
 
     /**
-     * Get the object if it is already available (has already been set). <p> If
-     * it is not available, this method returns immediately with null
+     * Get the object if it is already available (has already been set).
+     * <p>
+     * If it is not available, this method returns immediately with null
      *
      * @return the object if it is already available (has already been set)
      *
      * @throws InterruptedException
      */
     public R getImmediately() throws InterruptedException {
-        boolean available = latch.await(Integer.MIN_VALUE,TimeUnit.NANOSECONDS);
+        boolean available = latch.await(Integer.MIN_VALUE, TimeUnit.NANOSECONDS);
         //not part of any invariant
         //no need to lock/synchronize
         return (available ? object : null);
     }
 
     /**
-     * Get the object if it is already available (has already been set). <p> If
-     * it is not available, wait until it is or until an interrupt
+     * Get the object if it is already available (has already been set).
+     * <p>
+     * If it is not available, wait until it is or until an interrupt
      * (InterruptedException) terminates the wait.
      *
      * @return the object if it is already available (has already been set)
@@ -124,7 +129,7 @@ class ObjectLatch<R> {
      * @throws InterruptedException
      */
     public R get() throws InterruptedException {
-        latch.await(Integer.MAX_VALUE,TimeUnit.DAYS);
+        latch.await(Integer.MAX_VALUE, TimeUnit.DAYS);
         //not part of any invariant
         //no need to lock/synchronize
         return object;
@@ -132,7 +137,8 @@ class ObjectLatch<R> {
 
     /**
      * Get the object if it is already available (has already been set).
-     * <p>Causes the current thread to wait until the latch has counted down to
+     * <p>
+     * Causes the current thread to wait until the latch has counted down to
      * zero, unless the thread is interrupted, or the specified waiting time
      * elapses.
      *
@@ -141,7 +147,7 @@ class ObjectLatch<R> {
      * @throws InterruptedException
      */
     public R get(long time, TimeUnit unit) throws InterruptedException {
-        latch.await(time,unit);
+        latch.await(time, unit);
         //not part of any invariant
         //no need to lock/synchronize
         return object;

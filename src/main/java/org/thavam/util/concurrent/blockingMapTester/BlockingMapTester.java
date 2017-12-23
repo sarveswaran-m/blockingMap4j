@@ -22,10 +22,10 @@ public class BlockingMapTester {
 
     private final Map<Integer, String> referenceMap;
     private final BlockingMap<Integer, String> blockingMap;
-    private final Queue<String> productionErrors =
-            new ConcurrentLinkedQueue<String>();
-    private final Queue<Map.Entry<Integer, String>> comsumptionErrors =
-            new ConcurrentLinkedQueue<Map.Entry<Integer, String>>();
+    private final Queue<String> productionErrors
+            = new ConcurrentLinkedQueue<String>();
+    private final Queue<Map.Entry<Integer, String>> comsumptionErrors
+            = new ConcurrentLinkedQueue<Map.Entry<Integer, String>>();
     private List<Callable<Map.Entry<Integer, String>>> consumers;
     private List<Callable<String>> producers;
     private final ExecutorService executor;
@@ -160,17 +160,14 @@ public class BlockingMapTester {
     }
 
     void checkForConsumptionErrors() {
-        if (!comsumptionErrors.isEmpty()) {
-            Logger.getLogger(BlockingMapTester.class.getName()).log(Level.SEVERE,
-                    "errors found : {0}", comsumptionErrors);
-        }
+        Logger.getLogger(BlockingMapTester.class.getName()).log(Level.SEVERE,
+                "errors found : {0}", comsumptionErrors);
+
     }
 
     void checkForProductionErrors() {
-        if (!productionErrors.isEmpty()) {
-            Logger.getLogger(BlockingMapTester.class.getName()).log(Level.SEVERE,
-                    "errors found : {0}", productionErrors);
-        }
+        Logger.getLogger(BlockingMapTester.class.getName()).log(Level.SEVERE,
+                "errors found : {0}", productionErrors);
     }
 
     String getErrorDescription(Queue<Map.Entry<Integer, String>> error) {
@@ -198,6 +195,6 @@ public class BlockingMapTester {
         tester.checkForProductionErrors();
         tester.checkForConsumptionErrors();
         tester.shutDownSynchronizer();
-        tester.shutDownSynchronizer();
+        //tester.shutDownSynchronizer();
     }
 }

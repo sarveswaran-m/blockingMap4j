@@ -77,8 +77,10 @@ import java.util.concurrent.TimeUnit;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  * @author Sarveswaran M
- * @version 1.1, Semantics & contracts for a blocking map defined
+ *
  * @version 1.2, Semantics & contracts reviewed
+ * @version 1.1, Semantics & contracts for a blocking map defined
+ 
  */
 public interface BlockingMap<K, V> extends Map<K, V> {
 
@@ -143,7 +145,9 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * value prevents it from being stored in this map
      */
     @Override
-    V put(K key, V value);
+    V put(K key, V value); //TO_DO : How does consumer distinguish between success & space not available scenrio if null is returned in both cases
+    //This ambiguity does not arise in unbound queue
+    //When BoundQueue is supported, this has to be addressed
 
     /**
      * Removes the mapping for a key from this map if it is present.
@@ -191,7 +195,9 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to this queue
      */
-    V offer(K key, V value) throws InterruptedException;
+    V offer(K key, V value) throws InterruptedException; //TO_DO : How would consumer differenciate between sucessful offer with no previous binding & failure due to space unavailability on a boundQueue??
+//This ambiguity does not arise in unbound queue
+//When BoundQueue is supported, this has to be addressed
 
     /**
      * Retrieves and removes the mapping for a key from this map if it is
@@ -199,8 +205,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      *
      *
      * @param key key whose mapping is to be removed from the map
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
-     * if there was no mapping for <tt>key</tt>.
+     * @return the previous value associated with <tt>key</tt>
      * @throws UnsupportedOperationException if the <tt>remove</tt> operation is
      * not supported by this map
      * @throws ClassCastException if the key is of an inappropriate type for
@@ -209,7 +214,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * does not permit null keys (optional)
      * @throws InterruptedException if interrupted while waiting
      */
-    V take(Object key) throws InterruptedException; //TO_DO : What is the behavior if multiple consumers wait on same Key
+    V take(Object key) throws InterruptedException; //TO_DO : Behavior when mulitple consumers wait on the same key should be improved
 
     /**
      * Associates the specified value with the specified key in this map. If the
@@ -243,7 +248,8 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to this queue
      */
-    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException; //TO_DO : How does producer infer difference between success & timeout
+    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException; //TO_DO : How does producer infer difference bet when success & timeout
+    //BlockingQueue in Java follows the same semantic, sticking to the same,for now.
 
     /**
      * Retrieves and removes the mapping for a key from this map if it is

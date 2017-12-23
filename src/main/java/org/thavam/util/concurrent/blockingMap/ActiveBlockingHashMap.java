@@ -1,4 +1,4 @@
- /*
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -120,12 +120,13 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * Returns the value to which the specified key is mapped, or {@code null}
      * if this map contains no mapping for the key.
      *
-     * <p> Note that {@code null} is used as a special marker to indicate the
+     * <p>
+     * Note that {@code null} is used as a special marker to indicate the
      * absence of the requested key
      *
      * @param key the key whose associated value is to be returned
-     * @return the value to which the specified key is mapped, or
-     *         {@code null} if this map contains no mapping for the key
+     * @return the value to which the specified key is mapped, or {@code null}
+     * if this map contains no mapping for the key
      * @throws ClassCastException if the key is of an inappropriate type for
      * this map
      * @throws NullPointerException if the specified key is null and this map
@@ -157,11 +158,13 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method returns with <tt>null</tt>. put on an unbound map will always
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method returns with <tt>null</tt>. put on an unbound map will always
      * succeed
      *
-     * <p> Producers cannot put on a key that is already available on the map.
+     * <p>
+     * Producers cannot put on a key that is already available on the map.
      * Attempts to put a mapping whose key is already available on the map are
      * ignored. However, the same mapping can be put in to the map after it is
      * taken by consumer(s)
@@ -196,10 +199,12 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
     /**
      * Removes the mapping for a key from this map if it is present.
      *
-     * <p>Returns the value to which this map previously associated the key, or
+     * <p>
+     * Returns the value to which this map previously associated the key, or
      * <tt>null</tt> if the map contained no mapping for the key.
      *
-     * <p>The map will not contain a mapping for the specified key once the call
+     * <p>
+     * The map will not contain a mapping for the specified key once the call
      * returns.
      *
      * @param key key whose mapping is to be removed from the map
@@ -231,12 +236,14 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available. offer on an unbound map
-     * will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available. offer on an unbound map will
+     * always succeed
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -284,13 +291,15 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available or the specified time
-     * elapses. offer on an unbound map will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available or the specified time elapses.
+     * offer on an unbound map will always succeed
      *
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -337,27 +346,39 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
     @Override
     public V take(Object key, long timeout, TimeUnit unit) throws InterruptedException {
         V result = null;
-        primaryMapWriteLock.lock();
+
         //prevent any consumer from getting in to a blocked stated on cleared map
         if (!cleared.get()) {
+            /**
+             * Using one long write lock on primaryMap for entire operation
+             * would have prevented any other thread from taking. Hence, write
+             * lock is acquired once for put and once again for remove
+             */
+            primaryMapWriteLock.lock();
+            ObjectLatch<V> latch = null;
             try {
-                ObjectLatch<V> latch = primaryMap.get((K) key);
+                latch = primaryMap.get((K) key);
 
                 if (latch == null) {
                     primaryMap.putIfAbsent((K) key, new ObjectLatch<V>());
                     latch = primaryMap.get((K) key);
                 }
-
-                //put thread in map before awaiting
-                blockedThreadsMap.put(Thread.currentThread(), latch);
-                result = latch.get(timeout, unit);
-                //remove thread after awaiting
-                blockedThreadsMap.remove(Thread.currentThread());
-
-                return ((primaryMap.remove((K) key) == null) ? null : result);
             } finally {
                 primaryMapWriteLock.unlock();
             }
+            //put thread in map before awaiting
+            blockedThreadsMap.put(Thread.currentThread(), latch);
+            result = latch.get(timeout, unit);
+            //remove thread after awaiting
+            blockedThreadsMap.remove(Thread.currentThread());
+
+            primaryMapWriteLock.lock();
+            try {
+                result = ((primaryMap.remove((K) key) == null) ? null : result);
+            } finally {
+                primaryMapWriteLock.unlock();
+            }
+
         }
         return result;
     }
@@ -366,8 +387,9 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * Shuts down this blocking map & removes all mappings from this map. The
      * map will be empty after this call returns.
      *
-     * <p> Interrupts any threads waiting on any key in map before clearing.
-     * This is done to prevent threads being blocked forever
+     * <p>
+     * Interrupts any threads waiting on any key in map before clearing. This is
+     * done to prevent threads being blocked forever
      *
      * @throws IllegalStateException if the map has been shut-down
      */

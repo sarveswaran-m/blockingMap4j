@@ -18,20 +18,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * An unbound {@linkplain BlockingMap blocking map} backed by a hashmap that is
  * concurrent. This map offers no guarantee on the order of retrieval.
  *
- * <p>This is similar to unbounded buffer in which the synchronizer
- * elements inserted by producers and extracted by consumers. The only twist is
- * that each product has a key & consumers know which product they are
- * interested in. Attempts to <tt>put/offer</tt> an element into the map will
- * always succeed because this is an unbound map; attempts to <tt>take</tt>
+ * <p>
+ * This is similar to unbounded buffer in which the synchronizer elements are
+ * inserted by producers and extracted by consumers. The only twist is that each
+ * product has a key & consumers know which product they are interested in.
+ * Attempts to <tt>put/offer</tt> an element into the map will always succeed
+ * because this is an unbound map; attempts to <tt>take</tt>
  * element corresponding to a key that is not available on the map will block.
  *
  *
- * <p> This map can be shutdown using <tt>clear</tt>. All consumers blocked on
- * the map while invoking clear will be throw <tt>InterruptedException</tt> or
+ * <p>
+ * This map can be shutdown using <tt>clear</tt>. All consumers blocked on the
+ * map while invoking clear will be throw <tt>InterruptedException</tt> or
  * return with <tt>null</tt>. Attempting any operation after shutdown will throw
  * <tt>IllegalStateException</tt>.
  *
- * <p>This class implements some of <em>optional</em> methods of the {@link Map}.
+ * <p>
+ * This class implements some of <em>optional</em> methods of the {@link Map}.
  *
  *
  *
@@ -47,8 +50,8 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
 
     /**
      *
-     * state pattern employed since map exhibits distintively different behavior
-     * before and after clear/shutdown
+     * state pattern employed since map exhibits distinctively different
+     * behavior before and after clear/shutdown
      *
      */
     private volatile BlockingMap<K, V> state;
@@ -101,12 +104,13 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * Returns the value to which the specified key is mapped, or {@code null}
      * if this map contains no mapping for the key.
      *
-     * <p> Note that {@code null} is used as a special marker to indicate the
+     * <p>
+     * Note that {@code null} is used as a special marker to indicate the
      * absence of the requested key
      *
      * @param key the key whose associated value is to be returned
-     * @return the value to which the specified key is mapped, or
-     *         {@code null} if this map contains no mapping for the key
+     * @return the value to which the specified key is mapped, or {@code null}
+     * if this map contains no mapping for the key
      * @throws ClassCastException if the key is of an inappropriate type for
      * this map
      * @throws NullPointerException if the specified key is null and this map
@@ -124,11 +128,13 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method returns with <tt>null</tt>. put on an unbound map will always
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method returns with <tt>null</tt>. put on an unbound map will always
      * succeed
      *
-     * <p> Producers cannot put on a key that is already available on the map.
+     * <p>
+     * Producers cannot put on a key that is already available on the map.
      * Attempts to put a mapping whose key is already available on the map are
      * ignored. However, the same mapping can be put in to the map after it is
      * taken by consumer(s)
@@ -150,16 +156,25 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      */
     @Override
     public V put(K key, V value) {
+        /**
+         * TO_DO : How does consumer distinguish between success & space not
+         * available scenrio if null is returned in both cases This ambiguity
+         * does not arise in unbound queue When BoundQueue is supported, this
+         * has to be addressed
+         */
+
         return state.put(key, value);
     }
 
     /**
      * Removes the mapping for a key from this map if it is present.
      *
-     * <p>Returns the value to which this map previously associated the key, or
+     * <p>
+     * Returns the value to which this map previously associated the key, or
      * <tt>null</tt> if the map contained no mapping for the key.
      *
-     * <p>The map will not contain a mapping for the specified key once the call
+     * <p>
+     * The map will not contain a mapping for the specified key once the call
      * returns.
      *
      * @param key key whose mapping is to be removed from the map
@@ -183,12 +198,14 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available. offer on an unbound map
-     * will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available. offer on an unbound map will
+     * always succeed
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -206,6 +223,12 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      */
     @Override
     public V offer(K key, V value) throws InterruptedException {
+        /**
+         * TO_DO : How would consumer differenciate between successful offer with
+         * no previous binding & failure due to space unavailability on a
+         * boundQueue?? This ambiguity does not arise in unbound queue When
+         * BoundQueue is supported, this has to be addressed
+         */
         return state.offer(key, value);
     }
 
@@ -215,8 +238,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      *
      *
      * @param key key whose mapping is to be removed from the map
-     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
-     * if there was no mapping for <tt>key</tt>.
+     * @return the previous value associated with <tt>key</tt>.
      * @throws UnsupportedOperationException if the <tt>remove</tt> operation is
      * not supported by this map
      * @throws ClassCastException if the key is of an inappropriate type for
@@ -228,6 +250,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      */
     @Override
     public V take(Object key) throws InterruptedException {
+        //TO_DO : scope to improve scenario when multiple consumers wait on the same key
         return state.take(key);
     }
 
@@ -236,13 +259,15 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available or the specified time
-     * elapses. offer on an unbound map will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available or the specified time elapses.
+     * offer on an unbound map will always succeed
      *
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -252,6 +277,9 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * <tt>unit</tt>
      * @param unit a <tt>TimeUnit</tt> determining how to interpret the
      * <tt>timeout</tt> parameter
+     * @return the previous value associated with <tt>key</tt>, or <tt>null</tt>
+     * if there was no mapping for <tt>key</tt>. (A <tt>null</tt> return can
+     * also indicate a time out
      * @throws InterruptedException if interrupted while waiting
      * @throws ClassCastException if the class of the specified element prevents
      * it from being added to this queue
@@ -262,6 +290,8 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      */
     @Override
     public V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException {
+        //TO_DO : How would consumer differenciate between sucessful offer with no previous binding & failure due to space unavailability on a boundQueue & a timeout?
+        //BlockingQueue in Java follows the same semantic, sticking to the same,for now.
         return state.offer(key, value, timeout, unit);
     }
 
@@ -288,15 +318,17 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      */
     @Override
     public V take(Object key, long timeout, TimeUnit unit) throws InterruptedException {
+        //TO_DO : scope to improve scenario when multiple consumers wait on the same key
         return state.take(key, timeout, unit);
     }
 
     /**
-     * Shuts down this blocking map & removes all mappings from this map.The map 
+     * Shuts down this blocking map & removes all mappings from this map.The map
      * will be empty after this call.
      *
-     * <p> Interrupts any threads waiting on any key in map before clearing.
-     * This is done to prevent threads being blocked forever
+     * <p>
+     * Interrupts any threads waiting on any key in map before clearing. This is
+     * done to prevent threads being blocked forever
      *
      * @throws IllegalStateException if the map has been shut-down
      */

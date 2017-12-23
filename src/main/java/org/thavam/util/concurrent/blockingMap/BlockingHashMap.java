@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package org.thavam.util.concurrent;
+package org.thavam.util.concurrent.blockingMap;
 
 import java.util.Collection;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * An unbound {@linkplain BlockingMap blocking map} backed by a hashmap that is
  * concurrent. This map offers no guarantee on the order of retrieval.
  *
- * <p>This is similar to &quot;unbounded buffer&quot;, in which the synchronizer
+ * <p>This is similar to unbounded buffer in which the synchronizer
  * elements inserted by producers and extracted by consumers. The only twist is
  * that each product has a key & consumers know which product they are
  * interested in. Attempts to <tt>put/offer</tt> an element into the map will
@@ -292,8 +292,8 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
     }
 
     /**
-     * Shuts down this blocking map & removes all mappings from this map. The
-     * map will be empty after this call returns.
+     * Shuts down this blocking map & removes all mappings from this map.The map 
+     * will be empty after this call.
      *
      * <p> Interrupts any threads waiting on any key in map before clearing.
      * This is done to prevent threads being blocked forever
@@ -318,7 +318,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * @param value value whose presence in this map is to be tested
      * @return true if this map maps one or more keys to the specified value
      * @throws IllegalStateException if the map has been shut-down
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if map is in passive state
      */
     @Override
     public boolean containsValue(Object value) {
@@ -352,7 +352,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * producer/consumer methods not defined
      *
      * @throws IllegalStateException if the map has been shut-down
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if map is in passive state
      */
     @Override
     public Set<Map.Entry<K, V>> entrySet() {
@@ -364,7 +364,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * producer/consumer methods not defined
      *
      * @throws IllegalStateException if the map has been shut-down
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if map is in passive state
      */
     @Override
     public Set<K> keySet() {
@@ -376,7 +376,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * producer/consumer methods not defined
      *
      * @throws IllegalStateException if the map has been shut-down
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if map is in passive state
      */
     @Override
     public Collection<V> values() {
@@ -386,7 +386,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
     /**
      * To be supported
      *
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if map is in passive state
      * @throws IllegalStateException if the map has been shut-down
      */
     @Override

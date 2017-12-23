@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.thavam.test;
+package org.thavam.util.concurrent.blockingMapTester;
 
-import org.thavam.util.concurrent.BlockingHashMap;
-import org.thavam.util.concurrent.BlockingMap;
+import org.thavam.util.concurrent.blockingMap.BlockingHashMap;
+import org.thavam.util.concurrent.blockingMap.BlockingMap;
 
 /**
  *

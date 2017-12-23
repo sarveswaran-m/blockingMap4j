@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.thavam.util.concurrent;
+package org.thavam.util.concurrent.blockingMap;
 
 import java.util.Collection;
 import java.util.Map;

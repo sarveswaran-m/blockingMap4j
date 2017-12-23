@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.thavam.test;
+package org.thavam.util.concurrent.blockingMapTester;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.thavam.util.concurrent.BlockingHashMap;
-import org.thavam.util.concurrent.BlockingMap;
+import org.thavam.util.concurrent.blockingMap.BlockingHashMap;
+import org.thavam.util.concurrent.blockingMap.BlockingMap;
 
 /**
  *

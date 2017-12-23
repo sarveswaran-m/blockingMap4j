@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package org.thavam.util.concurrent;
+package org.thavam.util.concurrent.blockingMap;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

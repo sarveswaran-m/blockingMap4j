@@ -1,16 +1,17 @@
-# blockingMap4J
+# Welcome to the blockingMap4j wiki!
 
-### 1. What is it?
+
+### 1. What is it? <a name="what"></a>
 Blocking map acts as a key-based synchronizer between producers and consumers in concurrent environment. It is a Map that additionally supports operations that wait for a key to be available when retrieving an element. There can be multiple producers populating & multiple consumers consuming from the same blocking map. BlockingMap is **thread-safe & highly-concurrent**.
 > **Note:**
 > - For now, only unbound map implementation supported
 
-### 2. Why blockingMap4j?
+### 2. Why blockingMap4j? <a name="why"></a>
 In any concurrent environment with one or more producer(s) & consumer(s), synchronizer between the producers & consumers is required. A *Queue* is typically used as synchronizer. Java has many queue based synchronizers. The **BlockingQueue** interface with multiple implementations like *ArrayBlockingQueue, DelayQueue* etc are examples of queue based synchronizers in Java. 
 
 When a blocking queue is used as synchronizer, consumers can wait for any arbitrary object to be available. But consumers cannot wait for a specific object to be available i.e If each consumer is interested in a specific object, they cannot do so on a *BlockingQueue*. **BlockingMap** addresses this need for consumers to wait on specific objects in a concurrent producer-consumer environment. 
 
-### 3. How is it done?
+### 3. How is it done? <a name="how"></a>
 * BlockingMap is based on the concept of BlockingQueue. BlockingMap definition is consistent with blockingqueue.
 * Effort has been made to avoid locking, since locking adversely affects performance. When locking becomes un-avoidable, **Re-entrant read & write locks** is used to improve throughput. Read locks do not drastically reduce through put since they can inter leave.
 * BlockingMap abstraction & implementation separated. BlockingMap interface extends Map. There can be multiple BlockingMap implementations. There can be implementations that can be bound or unbound, ordered or unordered, etc.
@@ -26,7 +27,7 @@ instance of BlockedHashMap will land in PassiveBlockingHashMap.
 > **Note:**
 > - Refer to [Semantics of BlockingMap](#semantics) to understand the contract offered by BlockingMap
 
-### 4. Testing times for BlockingMap
+### 4. Testing times for BlockingMap <a name="test"></a>
 
 #### 4.1 Test Strategy
 - Idea is to first test the semantics of blocking map and then check its consistency by gradually
@@ -48,13 +49,14 @@ instance of BlockedHashMap will land in PassiveBlockingHashMap.
 - Scenario 7: Single Producer & Single Consumer –shut down & other operations
 - Scenario 8: Multiple producers & multiple consumers
 
-All test cases can be found in the spreadsheet attached here
+All test cases can be found in the spreadsheet attached <a href="https://docs.google.com/spreadsheets/d/1ka62aFjnkFLfovXzvYipmF9rKbWS0k0hqvsN0u3P70A/edit#gid=2143733835" target="_blank">here.</a>
 
 
-### 5. Future Enhancements
 
-- Current behavior when mulitple producers try to *offer(K)* & while multiple consumers try to *take(k)* on the same key should be further analyzed & refined
-- Concurrency improvements in Java 8 should be incorported
+### 5. Future Enhancements <a name="future"></a>
+
+- Current behaviour when multiple producers try to *offer(K)* & while multiple consumers try to *take(k)* on the same key should be further analysed & refined
+- Concurrency improvements in Java 8 should be incorporated
 - Conflicts & ambiguities on the blocking map arise only when operations on the same key
     interleave. Throughput can be increased to a big extent if there is a lock for each key.
 - A bound implementation of blocking map.
@@ -116,10 +118,12 @@ Examine| get(k)  |N.A       |N.A
 - All methods in the map interface need not be supported. However, methods that are essential
     in a producer-consumer environment should be supported. In general, any method in Map
     interface that can be supported unambiguously without introducing additional complexities
-    shall be supported. For detailed list of methods that are supported, **pleaserefer to javadoc**
+    shall be supported. For detailed list of methods that are supported, **pleaserefer to <a href="http://blockingmapforj.sourceforge.net/" target="_blank">javadoc</a>**
 - Null keys & values should not be accepted since null is used a special maker.Blocking map
     should throw a NullPointerException when an attempt is made to put a null key or value.
 - A logical shutdown operation should be supported. On shutdown, all blocked consumers should
     be notified (to prevent the consumers from waiting for-ever).
 - Any operation on a map that has been shut-down will throw an exception indicating the
     shutdown.
+
+  

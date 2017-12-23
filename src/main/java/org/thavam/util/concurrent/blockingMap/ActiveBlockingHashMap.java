@@ -350,9 +350,12 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
         //prevent any consumer from getting in to a blocked stated on cleared map
         if (!cleared.get()) {
             /**
+             * Bug Fix : For the bug raised @ https://sourceforge.net/p/blockingmapforj/discussion/874608/thread/646e5523/
              * Using one long write lock on primaryMap for entire operation
              * would have prevented any other thread from taking. Hence, write
              * lock is acquired once for put and once again for remove
+             * 
+             * 
              */
             primaryMapWriteLock.lock();
             ObjectLatch<V> latch = null;

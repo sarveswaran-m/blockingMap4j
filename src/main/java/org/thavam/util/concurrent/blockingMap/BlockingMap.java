@@ -90,7 +90,6 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * key
      * @throws ClassCastException if the key is of an inappropriate type for
      * this map (optional)
-     * @throws NullPointerException if the specified key is null
      */
     public boolean isKeyAvailable(K key);
 
@@ -168,9 +167,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
     V remove(Object key);
 
     /**
-     * Associates the specified value with the specified key in this map. If the
-     * map previously contained a mapping for the key, the old value is replaced
-     * by the specified value.
+     * Associates the specified value with the specified key in this map. 
      *
      * <p> If the Map is bounded and there is no space to put the new mapping,
      * this method blocks till space becomes available. offer on an unbound map
@@ -211,7 +208,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * does not permit null keys (optional)
      * @throws InterruptedException if interrupted while waiting
      */
-    V take(Object key) throws InterruptedException;
+    V take(Object key) throws InterruptedException; //TO_DO : What is the behavior if multiple consumers wait on same Key
 
     /**
      * Associates the specified value with the specified key in this map. If the
@@ -245,12 +242,12 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to this queue
      */
-    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException;
+    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException; //TO_DO : How does producer infer difference between success & timeout
 
     /**
      * Retrieves and removes the mapping for a key from this map if it is
      * present, waiting if necessary until the mapping becomes available or the
-     * specified time elapses. offer on an unbound map will always succeed.
+     * specified time elapses. 
      *
      *
      * @param key key with which the specified value is to be associated

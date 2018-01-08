@@ -64,9 +64,9 @@ All test cases can be found in the spreadsheet attached <a href="https://docs.go
 ### 6. Semantics of BlockingMap <a name="semantics"></a>
 
 - Three types of primary operations is allowed on the blockingmap.
-    o Insert
-    o Remove
-    o Examine
+  - Insert
+  - Remove
+  - Examine
 - Three flavors of each of these operations is supported.
 
 

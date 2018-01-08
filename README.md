@@ -99,8 +99,7 @@ Examine| get(k)  |N.A       |N.A
     block till the key becomes available. When the key becomes available, all the blocked threads
     should be notified. Actual removal of the mapping can & should happen from only one of the
     threads. Therefore, the operation should be successful from only one thread. Hence, value
-    should be returned on only one of the threads and not on all the threads. Null should be
-    returned on threads on which the operation was not successful.
+    should be returned on only one of the threads and not on all the threads.
 - When a consumer is blocked on take(k) waiting for a key that is not available yet, it can be
     interrupted. Consumer should return in this case with an Interrupted exception.
 - Offer(k,v, time, unit) should behave similar to Offer(k,v) but time out when the specified amount

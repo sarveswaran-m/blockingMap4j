@@ -91,7 +91,7 @@ public class BlockingMapTest {
             public String call() throws Exception {
                 String value = null;
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(500);
                     value = blockingMap.put(1, "one");
                 } catch (InterruptedException e) {
                     //interrupted
@@ -106,7 +106,7 @@ public class BlockingMapTest {
             public String call() throws Exception {
                 String value = null;
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(500);
                     value = blockingMap.put(2, "two");
                 } catch (InterruptedException e) {
                     //interrupted
@@ -174,7 +174,7 @@ public class BlockingMapTest {
         });
 
         printDecoratedMessage("waiting for producers to complete production");
-        Thread.sleep(12000);
+        Thread.sleep(1200);
 
         printDecoratedMessage("clearing synchronizer :: This will interrupt any waiting consumer");
         blockingMap.clear();

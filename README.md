@@ -72,45 +72,45 @@ All test cases can be found in the spreadsheet attached <a href="https://docs.go
 
 Special|value    |Blocks    |Times Out
 -------|---------|----------|----------
-Insert |put(k,v) |Offer(k,v)| Offer(k,v,time,unit)
+Insert |put(k,v) |offer(k,v)| offer(k,v,time,unit)
 Remove |remove(k)|take(k)   |take(k,time,unit)
 Examine| get(k)  |N.A       |N.A
 
-- Put(k,v) on an un-bound map should always be successful. Put(k,v) returns null if there was no
-    previous mapping for the given key. Put(k,v) returns the value that was previously associated
+- *put(k,v)* on an un-bound map should always be successful. *put(k,v)* returns null if there was no
+    previous mapping for the given key. *put(k,v)* returns the value that was previously associated
     with the given key (if such a mapping already exists in the map)
 - Bound blocking maps should return a special value to distinguish between successful & unsuccessful
-    invocation of a put(k,v)
-- Remove(k) usually removes the mapping corresponding to the given key & returns the value
+    invocation of a *put(k,v)*
+- *remove(k)* usually removes the mapping corresponding to the given key & returns the value
     corresponding to the given key.
-- Remove(k) on a key that does not exist in the map shouldreturn immediately with null.
-- Get(k) usually returns the value associated with the given key.
-- Get(k) on a key that does not exist in the map should return immediately with null.
-- Offer(k,v) should behave similar to put(k,v) under normal circumstances.
-- Offer(k,v) on a bound blocking map that is full should block till space is available on the map to
+- *remove(k)* on a key that does not exist in the map shouldreturn immediately with null.
+- *get(k)* usually returns the value associated with the given key.
+- *get(k)* on a key that does not exist in the map should return immediately with null.
+- *offer(k,v)* should behave similar to *put(k,v)* under normal circumstances.
+- *offer(k,v)* on a bound blocking map that is full should block till space is available on the map to
     put the specified mapping.
-- Take(K) usually returns with the value corresponding to the given key.
-- Take(k) on a key that does not exist will block, till that key becomes available. When the key
+- *take(K)* usually returns with the value corresponding to the given key.
+- *take(k)* on a key that does not exist will block, till that key becomes available. When the key
     becomes available, the corresponding mapping is removed from the map & value returned.
     i.e. an attempt by a consumer to consume the object corresponding to a key will block till a
     producer produces the object & puts it on the map. As soon as producer puts the product on the
     map, consumer takes it.
-- If take(k) on a key that does not exist is invoked from multiple threads, all the thread should
+- If *take(k)* on a key that does not exist is invoked from multiple threads, all the thread should
     block till the key becomes available. When the key becomes available, all the blocked threads
     should be notified. Actual removal of the mapping can & should happen from only one of the
     threads. Therefore, the operation should be successful from only one thread. Hence, value
     should be returned on only one of the threads and not on all the threads. Null should be
     returned on threads on which the operation was not successful.
-- When a consumer is blocked on take(k) waiting for a key that is not available yet, it can be
+- When a consumer is blocked on *take(k)* waiting for a key that is not available yet, it can be
     interrupted. Consumer should return in this case with an Interrupted exception.
-- Offer(k,v, time, unit) should behave similar to Offer(k,v) but time out when the specified amount
+- *offer(k,v, time, unit)* should behave similar to *offer(k,v)* but time out when the specified amount
     of time elapses.
-- offer(k,v, time, unit) should return null when it times out.
+- *offer(k,v, time, unit)* should return null when it times out.
 - Bound blocking map Implementations should return a special value to differentiate a successful
-    invocation of offer(k,v, time, unit) from a timed out one.
-- Take(k, time, unit) should behave the same way as take(k) but time out after the specified time
+    invocation of *offer(k,v, time, unit)* from a timed out one.
+- *take(k, time, unit)* should behave the same way as *take(k)* but time out after the specified time
     elapses.
-- Take(k, time, unit) should return null when it times out.
+- *take(k, time, unit)* should return null when it times out.
 - The above specified operational constructs should hold well when multiple producers & consumers rendezvous with the map.
 - An attempt to put a key that already exists in the map will be ignored. Since blocking map acts as a synchronizer, every product produced should either be consumed or removed explicitly. Over-write on a synchronizer is not meaningful.
 - Map should exhibit highest level of concurrency characterized by minimal or no-locks.

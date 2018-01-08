@@ -32,18 +32,17 @@ public class BlockingMapTest {
     public static final String PRODUCER_2 = "producer-2";
    
     //map containing conditions
-    static volatile BlockingMap<Integer, String> blockingMap = null;
+    private static volatile BlockingMap<Integer, String> blockingMap = null;
 
    
     //value returned on interruption
-    static final String INTERRUPTED = "INTERRUPTED";
-    static final String EMTPY_STR = "";
-    static ExecutorService executor;
+    private static final String INTERRUPTED = "INTERRUPTED";
+    private static ExecutorService executor;
     //blocking thread
-    private static Callable producer1, producer2;
+    private static Callable<String> producer1, producer2;
     private static FutureTask<String> consumerTask1, consumerTask2;
 
-    static void printDecoratedMessage(String msg) {
+    private static void printDecoratedMessage(String msg) {
         Logger.getLogger(BlockingMapTest.class.getName()).log(
                 Level.INFO, Thread.currentThread().getName() + " : " + msg);
     }
@@ -174,7 +173,7 @@ public class BlockingMapTest {
             }
         });
 
-        printDecoratedMessage("waiting for producers to complete prodcution");
+        printDecoratedMessage("waiting for producers to complete production");
         Thread.sleep(12000);
 
         printDecoratedMessage("clearing synchronizer :: This will interrupt any waiting consumer");

@@ -249,7 +249,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * @throws IllegalStateException if the map has been shut-down
      */
     @Override
-    public V take(Object key) throws InterruptedException {
+    public V take(K key) throws InterruptedException {
         //TO_DO : scope to improve scenario when multiple consumers wait on the same key
         return state.take(key);
     }
@@ -317,7 +317,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
      * @throws IllegalStateException if the map has been shut-down
      */
     @Override
-    public V take(Object key, long timeout, TimeUnit unit) throws InterruptedException {
+    public V take(K key, long timeout, TimeUnit unit) throws InterruptedException {
         //TO_DO : scope to improve scenario when multiple consumers wait on the same key
         return state.take(key, timeout, unit);
     }
@@ -337,7 +337,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
         //clear the map only if it has not been cleared yet
         if (!cleared.getAndSet(true)) {
             BlockingMap<K, V> oldState = state;
-            state = PassiveHashMap.getInstance();
+            state = PassiveHashMap.<K,V>getInstance();
             oldState.clear();
         } else {
             state.clear();

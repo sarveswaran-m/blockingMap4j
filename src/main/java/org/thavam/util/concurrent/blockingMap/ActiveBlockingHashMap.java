@@ -51,7 +51,7 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * map containing blocked threads,necessary to interrupt all threads waiting
      * on keys in a cleared map
      */
-    private final Map<Thread, ObjectLatch> blockedThreadsMap;
+    private final Map<Thread, ObjectLatch<V>> blockedThreadsMap;
     /**
      *
      * operations on isAvailable(), take(..), clear(), containsValue(),
@@ -72,7 +72,7 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
     //package-private accessor prevents instantiation by entities from other packages
     ActiveBlockingHashMap() {
         this.primaryMap = new ConcurrentHashMap<K, ObjectLatch<V>>();
-        this.blockedThreadsMap = new ConcurrentHashMap<Thread, ObjectLatch>();
+        this.blockedThreadsMap = new ConcurrentHashMap<Thread, ObjectLatch<V>>();
     }
 
     /**
@@ -111,7 +111,8 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * does not permit null keys (optional)
      * @throws IllegalStateException if the map has been shut-down
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public boolean containsKey(Object key) {
         return isKeyAvailable((K) key);
     }
@@ -218,12 +219,13 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * does not permit null keys (optional)
      * @throws IllegalStateException if the map has been shut-down
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public V remove(Object key) {
         V result = null;
         try {
             //since key is available, this will return immediately
-            result = take(key, Integer.MIN_VALUE, TimeUnit.NANOSECONDS);
+            result = take((K)key, Integer.MIN_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException ex) {
             Logger.getLogger(ActiveBlockingHashMap.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -282,7 +284,7 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * @throws IllegalStateException if the map has been shut-down
      */
     @Override
-    public V take(Object key) throws InterruptedException {
+    public V take(K key) throws InterruptedException {
         return take(key, Integer.MAX_VALUE, TimeUnit.DAYS);
     }
 
@@ -343,8 +345,8 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
      * @throws InterruptedException if interrupted while waiting
      * @throws IllegalStateException if the map has been shut-down
      */
-    @Override
-    public V take(Object key, long timeout, TimeUnit unit) throws InterruptedException {
+	@Override
+    public V take(K key, long timeout, TimeUnit unit) throws InterruptedException {
         V result = null;
 
         //prevent any consumer from getting in to a blocked stated on cleared map
@@ -360,7 +362,7 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
             primaryMapWriteLock.lock();
             ObjectLatch<V> latch = null;
             try {
-                latch = primaryMap.get((K) key);
+                latch = primaryMap.get(key);
 
                 if (latch == null) {
                     primaryMap.putIfAbsent((K) key, new ObjectLatch<V>());
@@ -429,7 +431,7 @@ class ActiveBlockingHashMap<K, V> implements BlockingMap<K, V> {
                 //checking for availability
                 if ((latch.isAvailable())
                         && (latch.getImmediately() != null)
-                        && (latch.getImmediately().equals((V) value))) {
+                        && (latch.getImmediately().equals(value))) {
                     return true;
                 }
             }

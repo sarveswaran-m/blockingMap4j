@@ -225,7 +225,7 @@ public class BlockingMapTest {
 
         try {
 	        l1.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait for background tread was started
-	        Thread.sleep(300); // give background thread some more time to ensure take is really waiting
+	        Thread.sleep(TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL); // give background thread some more time to ensure take is really waiting
 	        q.clear();
 	        l2.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait on background thread is finished
 	        assertNull(t);

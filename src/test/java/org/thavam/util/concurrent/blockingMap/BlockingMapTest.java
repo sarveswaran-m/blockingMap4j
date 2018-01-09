@@ -200,14 +200,13 @@ public class BlockingMapTest {
 	/**
 	 * Figures out a finalization issue found for BlockingHashMap requiring a complex implementation 
 	 * for {@link AsyncDictionary#tryTake(String, int)}.<br>
-	 * Currently the test has been disabled to get the test task running without errors.
 	 */
 	@Test(timeout=2*FAIL_TIMEOUT+1000)
 	public final void testClearWithRunningTake() {
 		final ExecutorService executor = Executors.newFixedThreadPool(2);
         final BlockingHashMap<String, String> q = new BlockingHashMap<String, String>();
-        t = null;
-
+            t = null;
+            final int TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL = 300;
         final CountDownLatch l1 = new CountDownLatch(1);
         final CountDownLatch l2 = new CountDownLatch(1);
         executor.execute(new Runnable() {
@@ -239,12 +238,15 @@ public class BlockingMapTest {
         }
 	}
 
+        /**
+         *  Spawns two producers, two consumers & checks for consistent behavior of blocking map.
+         */
 	@Test
 	public final void testSimpleConcurrency() {
 		
-	    //blocking thread
+	    //consumer threads
 	    Thread consumer1, consumer2;
-	    //notifying thread
+	    //producer threads
 	    Thread producer1, producer2;
 	    
 	    final int TIME_MS_BEFORE_PRODUCE_ELEMENT = 300;
@@ -369,7 +371,7 @@ public class BlockingMapTest {
         }
 	}
 
-    private static List<Callable<Map.Entry<Integer, String>>> createConsumers(int numberOfConsumers, final BlockingMap<Integer, String> blockingMap, final Queue<Exception> catchedExceptions) {
+    private List<Callable<Map.Entry<Integer, String>>> createConsumers(int numberOfConsumers, final BlockingMap<Integer, String> blockingMap, final Queue<Exception> catchedExceptions) {
     	List<Callable<Map.Entry<Integer, String>>> consumers = new ArrayList<Callable<Map.Entry<Integer, String>>>();
         for (int i = 0; i < numberOfConsumers; i++) {
         	final int key = i;
@@ -399,7 +401,7 @@ public class BlockingMapTest {
         return consumers;
     }
 
-    private static void startConsuming(
+    private  void startConsuming(
     		final ExecutorService executor, 
     		final Queue<Map.Entry<Integer, String>> comsumptionErrors, 
     		final List<Callable<Map.Entry<Integer, String>>> consumers, 
@@ -431,7 +433,7 @@ public class BlockingMapTest {
 
     }
 
-    private static List<Callable<String>> createProducers(
+    private List<Callable<String>> createProducers(
     		int numberOfProducers, 
     		final BlockingMap<Integer, String> blockingMap, 
     		final Map<Integer, String> referenceMap) 
@@ -449,7 +451,7 @@ public class BlockingMapTest {
         return producers;
     }
 
-    private static void startProducing(
+    private void startProducing(
     		final ExecutorService executor, 
     		final Queue<String> productionErrors, 
     		final List<Callable<String>> producers, 
@@ -519,7 +521,8 @@ public class BlockingMapTest {
     	assertNotNull(blockingMap.get("key"));
     	assertEquals("value", blockingMap.get("key"));
     	
-    	blockingMap.remove("key");
+        //remove is expected to return currently mapped value. Hence, the assertion
+    	assertEquals("value",blockingMap.remove("key"));
     	assertNull(blockingMap.get("key"));
 	}
 

@@ -123,10 +123,13 @@ class PassiveHashMap<K,V> implements BlockingMap<K,V> {
     }
     
     @SuppressWarnings("rawtypes")
-	private static volatile PassiveHashMap singletonInstance = new PassiveHashMap();
+    private static class SingletonHolder{
+        private static volatile PassiveHashMap singletonInstance = new PassiveHashMap();
+    }
+	
     
     @SuppressWarnings("unchecked")
 	public static <K,V> PassiveHashMap<K,V> getInstance() {
-        return singletonInstance;
+        return SingletonHolder.singletonInstance;
     }
 }

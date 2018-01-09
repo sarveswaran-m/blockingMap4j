@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Should be accessible outside the package Meant to be used from
  * BlockingHashMap
  */
-class PassiveHashMap implements BlockingMap {
+class PassiveHashMap<K,V> implements BlockingMap<K,V> {
 
     //prevent instantiation by any other class
     private PassiveHashMap() {
@@ -39,37 +39,37 @@ class PassiveHashMap implements BlockingMap {
     }
 
     @Override
-    public Object get(Object key) {
+    public V get(Object key) {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object put(Object key, Object value) {
+    public V put(K key, V value) {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object remove(Object key) {
+    public V remove(Object key) {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object offer(Object key, Object value) throws InterruptedException {
+    public V offer(Object key, Object value) throws InterruptedException {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object take(Object key) throws InterruptedException {
+    public V take(Object key) throws InterruptedException {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object offer(Object key, Object value, long timeout, TimeUnit unit) {
+    public V offer(Object key, Object value, long timeout, TimeUnit unit) {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Object take(Object key, long timeout, TimeUnit unit) {
+    public V take(Object key, long timeout, TimeUnit unit) {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
@@ -103,33 +103,30 @@ class PassiveHashMap implements BlockingMap {
     }
 
     @Override
-    public Set keySet() {
+    public Set<K> keySet() {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Collection values() {
+    public Collection<V> values() {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public Set entrySet() {
+    public Set<Entry<K, V>> entrySet() {
         throw new IllegalStateException("Map Shutdown.Not Active");
     }
 
     @Override
-    public void putAll(Map m) {
+    public void putAll(Map<? extends K, ? extends V> m) {
         throw new UnsupportedOperationException("Map Shutdown.Not Active");
     }
-
-    //singleton implenentation
-    //static nested class - holder for singleton instance
-    private static class SingletonHolder {
-
-        static PassiveHashMap instance = new PassiveHashMap();
-    }
-
-    public static PassiveHashMap getInstance() {
-        return SingletonHolder.instance;
+    
+    @SuppressWarnings("rawtypes")
+	private static volatile PassiveHashMap singletonInstance = new PassiveHashMap();
+    
+    @SuppressWarnings("unchecked")
+	public static <K,V> PassiveHashMap<K,V> getInstance() {
+        return singletonInstance;
     }
 }

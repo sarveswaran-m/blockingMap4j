@@ -214,7 +214,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * does not permit null keys (optional)
      * @throws InterruptedException if interrupted while waiting
      */
-    V take(Object key) throws InterruptedException; //TO_DO : Behavior when mulitple consumers wait on the same key should be improved
+    V take(K key) throws InterruptedException; //TO_DO : Behavior when mulitple consumers wait on the same key should be improved
 
     /**
      * Associates the specified value with the specified key in this map. If the
@@ -271,5 +271,5 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * does not permit null keys (optional)
      * @throws InterruptedException if interrupted while waiting
      */
-    V take(Object key, long timeout, TimeUnit unit) throws InterruptedException;
+    V take(K key, long timeout, TimeUnit unit) throws InterruptedException;
 }

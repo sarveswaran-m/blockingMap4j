@@ -6,6 +6,7 @@
 package org.thavam.util.concurrent.blockingMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -139,7 +140,7 @@ public class BlockingMapTest {
     }
 
     /**
-     * Test of clear to interrupt blocked threads both consumers wait for their
+     * Test of clear to interrupt blocked threads. Both consumers wait for their
      * keys of interest before producers start producing. This is ensured by
      * making producers sleep before production.
      *
@@ -584,6 +585,108 @@ public class BlockingMapTest {
         } catch (InterruptedException e) {
             fail("unexpected interrruption on take");
         }
+    }
+
+    /**
+     * Tests behavior while multiple threads wait on non-existent key.
+     *
+     * If take(k) on a key that does not exist is invoked from multiple threads,
+     * all the thread should block till the key becomes available. When the key
+     * becomes available, all the blocked threads should be notified. Actual
+     * removal of the mapping can & should happen from only one of the threads.
+     * Therefore, the operation should be successful from only one thread.
+     * Hence, value should be returned on only one of the threads and not on all
+     * the threads. Null should be returned on threads on which the operation
+     * was not successful.
+     *
+     * Following pull request discusses this in detail:
+     *
+     * Pull request #4 https://github.com/sarveswaran-m/blockingMap4j/pull/4
+     */
+    @Test
+    public void testTakeOnUnAvailableKey() throws InterruptedException, ExecutionException {
+        /**
+         * log messages introduced to understand thread interaction. should be
+         * removed.
+         *
+         * Assertion for marker value on blocked consumer or expecting
+         * Interrupted exception would suffice
+         */
+        printDecoratedMessage("Starting consumers");
+        final int KEY_TO_WAIT_ON = 1;
+        final int TIME_MS_PRODUCER_SLEEP_INTERVAL = 300;
+
+        consumerTask1 = new FutureTask<String>(new Callable<String>() {
+            @Override
+            public String call() {
+                String value = null;
+                try {
+                    value = blockingMap.take(KEY_TO_WAIT_ON);
+                } catch (InterruptedException ex) {
+                    printDecoratedMessage("Exception on consumer 1");
+                    value = INTERRUPTED;
+                }
+                return value;
+            }
+        });
+
+        //second consumer thread
+        consumerTask2 = new FutureTask<String>(new Callable<String>() {
+            @Override
+            public String call() {
+                String value = null;
+                try {
+                    value = blockingMap.take(KEY_TO_WAIT_ON);
+                } catch (InterruptedException ex) {
+                    printDecoratedMessage("Exception on consumer 2");
+                    value = INTERRUPTED;
+                }
+                return value;
+            }
+        });
+
+        //producer thread 1
+        producer1 = new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                String value = null;
+                try {
+                    Thread.sleep(TIME_MS_PRODUCER_SLEEP_INTERVAL);
+                    value = blockingMap.put(KEY_TO_WAIT_ON, "one");
+                } catch (InterruptedException e) {
+                    //interrupted
+                }
+                return value;
+            }
+        };
+
+        printDecoratedMessage("Starting Consumers");
+        executor.submit(consumerTask1);
+        executor.submit(consumerTask2);
+
+        /*
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    printDecoratedMessage("waiting for results on different thread:");
+                    printDecoratedMessage("consumerTask1.get() = " + consumerTask1.get());
+                    printDecoratedMessage("consumerTask2.get() = " + consumerTask2.get());
+                } catch (InterruptedException ex) {
+                    printDecoratedMessage("Interrupted : consumerTask2.get() = ");
+                } catch (ExecutionException ex) {
+                    //Logger.getLogger(BlockingMapTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+         */
+        printDecoratedMessage("Starting Producer");
+        executor.submit(producer1);
+
+        String[] returns = {consumerTask1.get(), consumerTask2.get()};
+        String[] expectedReturns = {"one", null};
+
+        assertTrue(Arrays.asList(returns).containsAll(Arrays.asList(expectedReturns)));
     }
 
 }

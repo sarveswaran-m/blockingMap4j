@@ -664,22 +664,6 @@ public class BlockingMapTest {
         executor.submit(consumerTask1);
         executor.submit(consumerTask2);
 
-        /*
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    printDecoratedMessage("waiting for results on different thread:");
-                    printDecoratedMessage("consumerTask1.get() = " + consumerTask1.get());
-                    printDecoratedMessage("consumerTask2.get() = " + consumerTask2.get());
-                } catch (InterruptedException ex) {
-                    printDecoratedMessage("Interrupted : consumerTask2.get() = ");
-                } catch (ExecutionException ex) {
-                    //Logger.getLogger(BlockingMapTest.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-         */
         printDecoratedMessage("Starting Producer");
         executor.submit(producer1);
 

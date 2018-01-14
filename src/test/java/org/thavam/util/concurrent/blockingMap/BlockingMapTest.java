@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author emeensa
+ * @author Sarveswaran M
  */
 public class BlockingMapTest {
 
@@ -40,11 +40,10 @@ public class BlockingMapTest {
     public static final String CONSUMER_2 = "consumer-2";
     public static final String PRODUCER_1 = "producer-1";
     public static final String PRODUCER_2 = "producer-2";
-   
+
     //map containing conditions
     private static volatile BlockingMap<Integer, String> blockingMap = null;
 
-   
     //value returned on interruption
     private static final String INTERRUPTED = "INTERRUPTED";
     private static ExecutorService executor;
@@ -147,8 +146,7 @@ public class BlockingMapTest {
      * consumer2 waits on non-existent key, there it will block for-ever on
      * clear, consumer2 should be interrupted
      *
-     * Bug Id #1 
-     * https://github.com/sarveswaran-m/blockingMap4j/issues/1
+     * Bug Id #1 https://github.com/sarveswaran-m/blockingMap4j/issues/1
      */
     @Test
     public void testClear() throws InterruptedException, ExecutionException {
@@ -193,69 +191,69 @@ public class BlockingMapTest {
                 && (consumerTask2.get().equalsIgnoreCase(INTERRUPTED)));
 
     }
-    
-	private static final int FAIL_TIMEOUT = 2000;
-	private volatile String t;
-	
-	/**
-	 * Figures out a finalization issue found for BlockingHashMap requiring a complex implementation 
-	 * for {@link AsyncDictionary#tryTake(String, int)}.<br>
-	 */
-	@Test(timeout=2*FAIL_TIMEOUT+1000)
-	public final void testClearWithRunningTake() {
-		final ExecutorService executor = Executors.newFixedThreadPool(2);
+
+    private static final int FAIL_TIMEOUT = 2000;
+    private volatile String t;
+
+    /**
+     * Figures out a finalization issue found for BlockingHashMap requiring a
+     * complex implementation for
+     * {@link AsyncDictionary#tryTake(String, int)}.<br>
+     */
+    @Test(timeout = 2 * FAIL_TIMEOUT + 1000)
+    public final void testClearWithRunningTake() {
+        final ExecutorService executor = Executors.newFixedThreadPool(2);
         final BlockingHashMap<String, String> q = new BlockingHashMap<String, String>();
-            t = null;
-            final int TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL = 300;
+        t = null;
+        final int TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL = 300;
         final CountDownLatch l1 = new CountDownLatch(1);
         final CountDownLatch l2 = new CountDownLatch(1);
         executor.execute(new Runnable() {
-			@Override
-			public void run() {
-	            l1.countDown();
-	            try {
-					t = q.take("some non existent key", Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
-					fail("interrupted exception expected due to call to clear");
-				} catch (InterruptedException e) {
-					// expected exception
-				}
-	            l2.countDown();
-			}
-		});
+            @Override
+            public void run() {
+                l1.countDown();
+                try {
+                    t = q.take("some non existent key", Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+                    fail("interrupted exception expected due to call to clear");
+                } catch (InterruptedException e) {
+                    // expected exception
+                }
+                l2.countDown();
+            }
+        });
 
         try {
-	        l1.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait for background tread was started
-	        Thread.sleep(TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL); // give background thread some more time to ensure take is really waiting
-	        q.clear();
-	        l2.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait on background thread is finished
-	        assertNull(t);
-        } 
-        catch (InterruptedException e) {
-        	fail();
+            l1.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait for background tread was started
+            Thread.sleep(TIME_MS_BACKGROUND_THREAD_SLEEP_INTERVAL); // give background thread some more time to ensure take is really waiting
+            q.clear();
+            l2.await(FAIL_TIMEOUT, TimeUnit.MILLISECONDS); // wait on background thread is finished
+            assertNull(t);
+        } catch (InterruptedException e) {
+            fail();
+        } finally {
+            executor.shutdown();
         }
-        finally {
-    		executor.shutdown();
-        }
-	}
+    }
 
-        /**
-         *  Spawns two producers, two consumers & checks for consistent behavior of blocking map.
-         */
-	@Test
-	public final void testSimpleConcurrency() {
-		
-	    //consumer threads
-	    Thread consumer1, consumer2;
-	    //producer threads
-	    Thread producer1, producer2;
-	    
-	    final int TIME_MS_BEFORE_PRODUCE_ELEMENT = 300;
-	    final CountDownLatch bothDone = new CountDownLatch(2);
-	    final AtomicInteger backgroundThreadExceptionsCounter = new AtomicInteger(0);
+    /**
+     * Spawns two producers, two consumers & checks for consistent behavior of
+     * blocking map.
+     */
+    @Test
+    public final void testSimpleConcurrency() {
 
-	    final BlockingMap<Integer, String> blockingMap = new BlockingHashMap<Integer, String>();
+        //consumer threads
+        Thread consumer1, consumer2;
+        //producer threads
+        Thread producer1, producer2;
 
-	    //first consumer thread
+        final int TIME_MS_BEFORE_PRODUCE_ELEMENT = 300;
+        final CountDownLatch bothDone = new CountDownLatch(2);
+        final AtomicInteger backgroundThreadExceptionsCounter = new AtomicInteger(0);
+
+        final BlockingMap<Integer, String> blockingMap = new BlockingHashMap<Integer, String>();
+
+        //first consumer thread
         consumer1 = new Thread("consumer-1") {
 
             public void run() {
@@ -263,7 +261,7 @@ public class BlockingMapTest {
                     blockingMap.take(new Integer(1));
                     bothDone.countDown();
                 } catch (InterruptedException e) {
-                	backgroundThreadExceptionsCounter.incrementAndGet();
+                    backgroundThreadExceptionsCounter.incrementAndGet();
                     e.printStackTrace();
                 }
             }
@@ -277,7 +275,7 @@ public class BlockingMapTest {
                     blockingMap.take(new Integer(2));
                     bothDone.countDown();
                 } catch (InterruptedException e) {
-                	backgroundThreadExceptionsCounter.incrementAndGet();
+                    backgroundThreadExceptionsCounter.incrementAndGet();
                     e.printStackTrace();
                 }
             }
@@ -291,7 +289,7 @@ public class BlockingMapTest {
                     Thread.sleep(TIME_MS_BEFORE_PRODUCE_ELEMENT);
                     blockingMap.put(new Integer(2), "two");
                 } catch (InterruptedException e) {
-                	backgroundThreadExceptionsCounter.incrementAndGet();
+                    backgroundThreadExceptionsCounter.incrementAndGet();
                     e.printStackTrace();
                 }
             }
@@ -305,7 +303,7 @@ public class BlockingMapTest {
                     Thread.sleep(TIME_MS_BEFORE_PRODUCE_ELEMENT);
                     blockingMap.put(new Integer(1), "one");
                 } catch (InterruptedException e) {
-                	backgroundThreadExceptionsCounter.incrementAndGet();
+                    backgroundThreadExceptionsCounter.incrementAndGet();
                     e.printStackTrace();
                 }
             }
@@ -317,64 +315,65 @@ public class BlockingMapTest {
         producer2.start();
 
         try {
-			assertTrue("not all expected elements put to map received within a given time period", 
-					bothDone.await(3*TIME_MS_BEFORE_PRODUCE_ELEMENT, TimeUnit.MILLISECONDS));
-		} catch (InterruptedException e) {
-			fail();
-		}
-        
+            assertTrue("not all expected elements put to map received within a given time period",
+                    bothDone.await(3 * TIME_MS_BEFORE_PRODUCE_ELEMENT, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            fail();
+        }
+
         assertEquals("unexpected exception happeded in background thread", 0, backgroundThreadExceptionsCounter.get());
-	}
-	
-	@Test
-	public void testSuffisticatedConcurrency() throws Exception {
-		final int numberOfConsumersProducers = 100;
-		
-	    final Map<Integer, String> referenceMap;
-	    final BlockingMap<Integer, String> blockingMap;
+    }
 
-	    List<Callable<Map.Entry<Integer, String>>> consumers;
-	    List<Callable<String>> producers;
-	    final ExecutorService executor;
+    @Test
+    public void testSuffisticatedConcurrency() throws Exception {
+        final int numberOfConsumersProducers = 100;
 
-	    final Queue<String> productionErrors = new ConcurrentLinkedQueue<String>();
-	    final Queue<Map.Entry<Integer, String>> comsumptionErrors = new ConcurrentLinkedQueue<Map.Entry<Integer, String>>();
-	    final Queue<Exception> catchedExceptions = new ConcurrentLinkedQueue<Exception>();
-	    
-	    // fill reference map
+        final Map<Integer, String> referenceMap;
+        final BlockingMap<Integer, String> blockingMap;
+
+        List<Callable<Map.Entry<Integer, String>>> consumers;
+        List<Callable<String>> producers;
+        final ExecutorService executor;
+
+        final Queue<String> productionErrors = new ConcurrentLinkedQueue<String>();
+        final Queue<Map.Entry<Integer, String>> comsumptionErrors = new ConcurrentLinkedQueue<Map.Entry<Integer, String>>();
+        final Queue<Exception> catchedExceptions = new ConcurrentLinkedQueue<Exception>();
+
+        // fill reference map
         referenceMap = new ConcurrentHashMap<Integer, String>();
-		for (int i = 0; i < numberOfConsumersProducers; i++) {
+        for (int i = 0; i < numberOfConsumersProducers; i++) {
             referenceMap.put(i, "Stringy " + i);
         }
-        
+
         blockingMap = new BlockingHashMap<Integer, String>();
         executor = Executors.newCachedThreadPool();
 
         final CountDownLatch consumingFinished = new CountDownLatch(1);
 
         try {
-	        consumers = createConsumers(numberOfConsumersProducers, blockingMap, catchedExceptions);
-	        startConsuming(executor, comsumptionErrors, consumers, referenceMap, consumingFinished, catchedExceptions);
-	        
-	        producers = createProducers(numberOfConsumersProducers, blockingMap, referenceMap);
-	        startProducing(executor, productionErrors, producers, catchedExceptions);
-	        
-	        assertTrue("consuming timed out", consumingFinished.await(2, TimeUnit.SECONDS));
-	        blockingMap.clear();
-	
-	        assertTrue(productionErrors.isEmpty());
-	        assertTrue(comsumptionErrors.isEmpty());
-	        if (catchedExceptions.size() > 0) fail(catchedExceptions.peek().getMessage());
+            consumers = createConsumers(numberOfConsumersProducers, blockingMap, catchedExceptions);
+            startConsuming(executor, comsumptionErrors, consumers, referenceMap, consumingFinished, catchedExceptions);
+
+            producers = createProducers(numberOfConsumersProducers, blockingMap, referenceMap);
+            startProducing(executor, productionErrors, producers, catchedExceptions);
+
+            assertTrue("consuming timed out", consumingFinished.await(2, TimeUnit.SECONDS));
+            blockingMap.clear();
+
+            assertTrue(productionErrors.isEmpty());
+            assertTrue(comsumptionErrors.isEmpty());
+            if (catchedExceptions.size() > 0) {
+                fail(catchedExceptions.peek().getMessage());
+            }
+        } finally {
+            executor.shutdown();
         }
-        finally {
-    		executor.shutdown();
-        }
-	}
+    }
 
     private List<Callable<Map.Entry<Integer, String>>> createConsumers(int numberOfConsumers, final BlockingMap<Integer, String> blockingMap, final Queue<Exception> catchedExceptions) {
-    	List<Callable<Map.Entry<Integer, String>>> consumers = new ArrayList<Callable<Map.Entry<Integer, String>>>();
+        List<Callable<Map.Entry<Integer, String>>> consumers = new ArrayList<Callable<Map.Entry<Integer, String>>>();
         for (int i = 0; i < numberOfConsumers; i++) {
-        	final int key = i;
+            final int key = i;
             consumers.add(new Callable<Map.Entry<Integer, String>>() {
                 @Override
                 public Map.Entry<Integer, String> call() {
@@ -382,17 +381,32 @@ public class BlockingMapTest {
                     try {
                         final String valueString = blockingMap.take(key);
 //                        System.out.println("blockingmap.take(" + key + ") = " + valueString);
-                        entry = new Map.Entry<Integer, String>() 
-                        		{
-		                            final Integer entryKey = key;
-		                            final String value = valueString;
-		                            @Override public Integer getKey() { return entryKey; }
-		                            @Override public String getValue() { return value; }
-		                            @Override public String setValue(String value) { throw new UnsupportedOperationException("Not supported yet."); }
-		                            @Override public String toString() { return ("key,value : " + entryKey + ":" + value); }
-                        		};
+                        entry = new Map.Entry<Integer, String>() {
+                            final Integer entryKey = key;
+                            final String value = valueString;
+
+                            @Override
+                            public Integer getKey() {
+                                return entryKey;
+                            }
+
+                            @Override
+                            public String getValue() {
+                                return value;
+                            }
+
+                            @Override
+                            public String setValue(String value) {
+                                throw new UnsupportedOperationException("Not supported yet.");
+                            }
+
+                            @Override
+                            public String toString() {
+                                return ("key,value : " + entryKey + ":" + value);
+                            }
+                        };
                     } catch (InterruptedException ex) {
-                    	catchedExceptions.add(ex);
+                        catchedExceptions.add(ex);
                     }
                     return entry;
                 }
@@ -401,46 +415,43 @@ public class BlockingMapTest {
         return consumers;
     }
 
-    private  void startConsuming(
-    		final ExecutorService executor, 
-    		final Queue<Map.Entry<Integer, String>> comsumptionErrors, 
-    		final List<Callable<Map.Entry<Integer, String>>> consumers, 
-    		final Map<Integer, String> referenceMap,
-    		final CountDownLatch consumingFinished,
-    		final Queue<Exception> catchedExceptions) 
-    {
+    private void startConsuming(
+            final ExecutorService executor,
+            final Queue<Map.Entry<Integer, String>> comsumptionErrors,
+            final List<Callable<Map.Entry<Integer, String>>> consumers,
+            final Map<Integer, String> referenceMap,
+            final CountDownLatch consumingFinished,
+            final Queue<Exception> catchedExceptions) {
         executor.submit(new FutureTask<Void>(new Runnable() {
 
-			@Override
-			public void run() {
-				try {
-					List<Future<Map.Entry<Integer, String>>> products = executor.invokeAll(consumers);
-					for (Future<Map.Entry<Integer, String>> product : products) {
-						Map.Entry<Integer, String> returnedEntry = product.get();
-						if (!(returnedEntry.getValue().equals(referenceMap.get(returnedEntry.getKey())))) 
-						{
-							comsumptionErrors.add(returnedEntry);
-						}
-					}
-					consumingFinished.countDown();
-				} catch (ExecutionException ex) {
-					catchedExceptions.add(ex);
-				} catch (InterruptedException ex) {
-					catchedExceptions.add(ex);
-				}
-			}
+            @Override
+            public void run() {
+                try {
+                    List<Future<Map.Entry<Integer, String>>> products = executor.invokeAll(consumers);
+                    for (Future<Map.Entry<Integer, String>> product : products) {
+                        Map.Entry<Integer, String> returnedEntry = product.get();
+                        if (!(returnedEntry.getValue().equals(referenceMap.get(returnedEntry.getKey())))) {
+                            comsumptionErrors.add(returnedEntry);
+                        }
+                    }
+                    consumingFinished.countDown();
+                } catch (ExecutionException ex) {
+                    catchedExceptions.add(ex);
+                } catch (InterruptedException ex) {
+                    catchedExceptions.add(ex);
+                }
+            }
         }, null));
 
     }
 
     private List<Callable<String>> createProducers(
-    		int numberOfProducers, 
-    		final BlockingMap<Integer, String> blockingMap, 
-    		final Map<Integer, String> referenceMap) 
-    {
-    	List<Callable<String>> producers = new ArrayList<Callable<String>>();
+            int numberOfProducers,
+            final BlockingMap<Integer, String> blockingMap,
+            final Map<Integer, String> referenceMap) {
+        List<Callable<String>> producers = new ArrayList<Callable<String>>();
         for (int j = 0; j < numberOfProducers; j++) {
-        	final int key = j;
+            final int key = j;
             producers.add(new Callable<String>() {
                 @Override
                 public String call() {
@@ -452,11 +463,10 @@ public class BlockingMapTest {
     }
 
     private void startProducing(
-    		final ExecutorService executor, 
-    		final Queue<String> productionErrors, 
-    		final List<Callable<String>> producers, 
-    		final Queue<Exception> catchedExceptions) 
-    {
+            final ExecutorService executor,
+            final Queue<String> productionErrors,
+            final List<Callable<String>> producers,
+            final Queue<Exception> catchedExceptions) {
         executor.submit(new FutureTask<String>(new Callable<String>() {
 
             @Override
@@ -470,10 +480,8 @@ public class BlockingMapTest {
                             productionErrors.add(ack);
                         }
                     }
-                } catch (ExecutionException ex) {
-                	catchedExceptions.add(ex);
-                } catch (InterruptedException ex) {
-                	catchedExceptions.add(ex);
+                } catch (ExecutionException | InterruptedException ex) {
+                    catchedExceptions.add(ex);
                 }
                 return null;
             }
@@ -481,102 +489,101 @@ public class BlockingMapTest {
     }
 
     @Test
-	public final void testIsKeyAvailable() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	assertFalse(blockingMap.isKeyAvailable("non-existing key"));
-    	assertTrue(blockingMap.isKeyAvailable("key"));
-    	assertTrue(blockingMap.isKeyAvailable("key"));
-	}
+    public final void testIsKeyAvailable() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
 
-	@Test
-	public final void testGetObject() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	assertNull(blockingMap.get("non-existing key"));
-    	assertNotNull(blockingMap.get("key"));
-    	assertEquals("value", blockingMap.get("key"));
-    	assertEquals("value", blockingMap.get("key"));
-	}
+        assertFalse(blockingMap.isKeyAvailable("non-existing key"));
+        assertTrue(blockingMap.isKeyAvailable("key"));
+        assertTrue(blockingMap.isKeyAvailable("key"));
+    }
 
-	@Test
-	public final void testPutKV() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	assertNotNull(blockingMap.get("key"));
-    	assertEquals("value", blockingMap.get("key"));
-    	
-    	blockingMap.put("key", "other value");
-    	assertEquals("value", blockingMap.get("key"));
-	}
+    @Test
+    public final void testGetObject() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
 
-	@Test
-	public final void testRemoveObject() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	assertNotNull(blockingMap.get("key"));
-    	assertEquals("value", blockingMap.get("key"));
-    	
+        assertNull(blockingMap.get("non-existing key"));
+        assertNotNull(blockingMap.get("key"));
+        assertEquals("value", blockingMap.get("key"));
+        assertEquals("value", blockingMap.get("key"));
+    }
+
+    @Test
+    public final void testPutKV() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
+
+        assertNotNull(blockingMap.get("key"));
+        assertEquals("value", blockingMap.get("key"));
+
+        blockingMap.put("key", "other value");
+        assertEquals("value", blockingMap.get("key"));
+    }
+
+    @Test
+    public final void testRemoveObject() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
+
+        assertNotNull(blockingMap.get("key"));
+        assertEquals("value", blockingMap.get("key"));
+
         //remove is expected to return currently mapped value. Hence, the assertion
-    	assertEquals("value",blockingMap.remove("key"));
-    	assertNull(blockingMap.get("key"));
-	}
+        assertEquals("value", blockingMap.remove("key"));
+        assertNull(blockingMap.get("key"));
+    }
 
-	@Test
-	public final void testTakeK() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	String gotValue;
-		try {
-			gotValue = blockingMap.take("key");
-			assertNotNull(gotValue);
-			assertEquals("value", gotValue);
-			assertFalse(blockingMap.isKeyAvailable("key"));
-			assertTrue(blockingMap.isEmpty());
-		} catch (InterruptedException e) {
-			fail("unexpected interrruption on take");
-		}
-	}
+    @Test
+    public final void testTakeK() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
 
-	@Test
-	public final void testTakeKLongTimeUnit() {
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	blockingMap.put("key", "value");
-    	
-    	String gotValue;
-		try {
-			gotValue = blockingMap.take("key", 1, TimeUnit.SECONDS);
-			assertNotNull(gotValue);
-			assertEquals("value", gotValue);
-			assertFalse(blockingMap.isKeyAvailable("key"));
-			assertTrue(blockingMap.isEmpty());
-		} catch (InterruptedException e) {
-			fail("unexpected interrruption on take");
-		}
-	}
+        String gotValue;
+        try {
+            gotValue = blockingMap.take("key");
+            assertNotNull(gotValue);
+            assertEquals("value", gotValue);
+            assertFalse(blockingMap.isKeyAvailable("key"));
+            assertTrue(blockingMap.isEmpty());
+        } catch (InterruptedException e) {
+            fail("unexpected interrruption on take");
+        }
+    }
 
-	@Test
-	public final void testTakeKLongTimeUnit_TimingOUt() {
-		final int WAIT_TIME = 300;
-    	BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
-    	
-    	String gotValue;
-		try {
-			long startTime = System.currentTimeMillis();
-			gotValue = blockingMap.take("non-existing key", WAIT_TIME, TimeUnit.MILLISECONDS);
-			long duration = System.currentTimeMillis() - startTime;
-			assertTrue("taken duration not within expected timeout time", duration <= WAIT_TIME+(WAIT_TIME/10) && duration >= WAIT_TIME); // 10% errro is OK
-			assertNull(gotValue);
-			assertTrue(blockingMap.isEmpty());
-		} catch (InterruptedException e) {
-			fail("unexpected interrruption on take");
-		}
-	}
+    @Test
+    public final void testTakeKLongTimeUnit() {
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+        blockingMap.put("key", "value");
 
+        String gotValue;
+        try {
+            gotValue = blockingMap.take("key", 1, TimeUnit.SECONDS);
+            assertNotNull(gotValue);
+            assertEquals("value", gotValue);
+            assertFalse(blockingMap.isKeyAvailable("key"));
+            assertTrue(blockingMap.isEmpty());
+        } catch (InterruptedException e) {
+            fail("unexpected interrruption on take");
+        }
+    }
+
+    @Test
+    public final void testTakeKLongTimeUnit_TimingOUt() {
+        final int WAIT_TIME = 300;
+        BlockingMap<String, String> blockingMap = new BlockingHashMap<String, String>();
+
+        String gotValue;
+        try {
+            long startTime = System.currentTimeMillis();
+            gotValue = blockingMap.take("non-existing key", WAIT_TIME, TimeUnit.MILLISECONDS);
+            long duration = System.currentTimeMillis() - startTime;
+            assertTrue("taken duration not within expected timeout time", duration <= WAIT_TIME + (WAIT_TIME / 10) && duration >= WAIT_TIME); // 10% errro is OK
+            assertNull(gotValue);
+            assertTrue(blockingMap.isEmpty());
+        } catch (InterruptedException e) {
+            fail("unexpected interrruption on take");
+        }
+    }
 
 }

@@ -1,24 +1,60 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.thavam.util.concurrent</groupId>
     <artifactId>blockingMap</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.9</version>
     <packaging>jar</packaging>
 
     <name>blockingMap</name>
-    <url>http://maven.apache.org</url>
+    <description>Map based synchronizer</description>
+    <url>https://github.com/sarveswaran-m/blockingMap4j/wiki</url>
+    <licenses>    
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Sarveswaran M</name>
+            <email>sarveswaran.ms@gmail.com</email>
+            <organization>Open Source</organization>
+            <organizationUrl>https://github.com/sarveswaran-m/blockingMap4j</organizationUrl>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:git://github.com/sarveswaran-m/blockingMap4j.git</connection>
+        <developerConnection>scm:git:ssh://github.com/sarveswaran-m/blockingMap4j.git</developerConnection>
+        <url>http://github.com/sarveswaran-m/blockingMap4j/tree/master</url>
+    </scm>
+    
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>securecentral</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>securecentral</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-<!--         JUnit 5 brings in more Java 8 specific features
+        <!--         JUnit 5 brings in more Java 8 specific features
         need to understand JUnit 5 before enabling the same here -->
         <junit.version>4.12</junit.version>
         <maven.compiler.plugin>3.3</maven.compiler.plugin>
         <maven.surefile.plugin>2.19</maven.surefile.plugin>
+        <maven.source.plugin>2.2.1</maven.source.plugin>
+        <maven.javadoc.plugin>2.9.1</maven.javadoc.plugin>
+        <maven.gpg.plugin>1.5</maven.gpg.plugin>
     </properties>
 
     <build>
@@ -38,6 +74,47 @@
                 <configuration>
                     <!--    <foo>bar</foo> -->
                 </configuration>
+            </plugin>
+            <!--            Following plugins required inorder to meet ossrh project hosting requirements-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven.gpg.plugin}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

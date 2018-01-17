@@ -12,37 +12,47 @@ import java.util.concurrent.TimeUnit;
  * operations that wait for a key to be available when retrieving an element.
  * Blocking map acts as a synchronizer between producers and consumers.
  *
- * <p> BlockingMap methods come in three forms, with different ways of handling
+ * <p>
+ * BlockingMap methods come in three forms, with different ways of handling
  * operations that cannot be satisfied immediately, but may be satisfied at some
  * point in the future: one returns a special value, the second blocks the
  * current thread indefinitely until the operation can succeed, and the third
  * blocks for only a given maximum time limit before giving up. These methods
  * are summarized in the following table:
  *
- * <p> <table BORDER CELLPADDING=3 CELLSPACING=1> <tr> <td></td> <td
+ * <table summary="Semantics Table" BORDER CELLPADDING=3 CELLSPACING=1> <tr>
+ * <td></td> <td
  * ALIGN=CENTER><em>Special value</em></td> <td
  * ALIGN=CENTER><em>Blocks</em></td> <td ALIGN=CENTER><em>Times out</em></td>
- * </tr> <tr> <td><b>Insert</b></td> <td>{@link #put put(key, value)}</td> <td>{@link #offer offer(key, value)}</td> <td>{@link #offer(Object, Object, long, TimeUnit) offer(key, value, time, unit)}</td>
- * </tr> <tr> <td><b>Remove</b></td> <td>{@link #remove remove(key)}</td> <td>{@link #take take(key)}</td> <td>{@link #take(Object, long, TimeUnit) take(key, time, unit)}</td>
+ * </tr> <tr> <td><b>Insert</b></td> <td>{@link #put put(key, value)}</td>
+ * <td>{@link #offer offer(key, value)}</td>
+ * <td>{@link #offer(Object, Object, long, TimeUnit) offer(key, value, time, unit)}</td>
+ * </tr> <tr> <td><b>Remove</b></td> <td>{@link #remove remove(key)}</td>
+ * <td>{@link #take take(key)}</td>
+ * <td>{@link #take(Object, long, TimeUnit) take(key, time, unit)}</td>
  * </tr> <tr> <td><b>Examine</b></td> <td>{@link #get get()}</td> <td><em>not
  * applicable</em></td> <td><em>not applicable</em></td> </tr> </table>
  *
- * <p> A BlockingMap does not accept null elements. Implementations throw
+ * <p>
+ * A BlockingMap does not accept null elements. Implementations throw
  * NullPointerException on attempts to put or offer a null. A null is used as a
- * sentinel value to indicate failure of get & take operations.
+ * sentinel value to indicate failure of get and take operations.
  *
- * <p> A BlockingMap may be capacity bounded. At any given time it may have a
+ * <p>
+ * A BlockingMap may be capacity bounded. At any given time it may have a
  * remainingCapacity beyond which no additional elements can be put without
  * blocking. A BlockingQueue without any intrinsic capacity constraints always
  * reports a remaining capacity of Integer.MAX_VALUE.
  *
- * <p> BlockingMap implementations are designed to be used primarily for
+ * <p>
+ * BlockingMap implementations are designed to be used primarily for
  * producer-consumer queues, but additionally support the Collection interface.
  * So, for example, it is possible to put a group of key-value pairs to a map
  * using putAll(map). However, such operations are in general not performed very
  * efficiently, and are intended for only occasional use.
  *
- * <p> BlockingMap implementations are thread-safe. All queuing methods achieve
+ * <p>
+ * BlockingMap implementations are thread-safe. All queuing methods achieve
  * their effects atomically using internal locks or other forms of concurrency
  * control. However, the bulk Collection operations addAll, containsAll,
  * retainAll and removeAll are not necessarily performed atomically unless
@@ -50,24 +60,25 @@ import java.util.concurrent.TimeUnit;
  * putAll(map) to fail (throwing an exception) after adding only some of the
  * elements in map.
  *
- * <p> A BlockingMap does not intrinsically support any kind of "close" or
+ * <p>
+ * A BlockingMap does not intrinsically support any kind of "close" or
  * "shutdown" operation to indicate that no more items will be added. The needs
  * and usage of such features tend to be implementation-dependent. For example,
  * a common tactic is for producers to insert special end-of-stream or poison
  * objects, that are interpreted accordingly when taken by consumers.
  *
- * <p> BlockingMap implementations generally do not define element-based
- * versions of methods equals and hashCode but instead inherit the identity
- * based versions from class Object, because element-based equality is not
- * always well-defined for queues with the same elements but different ordering
- * properties.
+ * <p>
+ * BlockingMap implementations generally do not define element-based versions of
+ * methods equals and hashCode but instead inherit the identity based versions
+ * from class Object, because element-based equality is not always well-defined
+ * for queues with the same elements but different ordering properties.
  *
  *
- * <p> Producers cannot
- * <code>put(key, value)/offer(key, value)</code> on a key that is already
- * available on the map. Attempts to put a mapping whose key is already
- * available on the map are ignored. However, the same mapping can be put in to
- * the map after it is taken by consumer(s)
+ * <p>
+ * Producers cannot <code>put(key, value)/offer(key, value)</code> on a key that
+ * is already available on the map. Attempts to put a mapping whose key is
+ * already available on the map are ignored. However, the same mapping can be
+ * put in to the map after it is taken by consumer(s)
  *
  *
  * Usage example, based on a typical producer-consumer scenario. Note that a
@@ -78,9 +89,9 @@ import java.util.concurrent.TimeUnit;
  * @param <V> the type of mapped values
  * @author Sarveswaran M
  *
- * @version 1.2, Semantics & contracts reviewed
- * @version 1.1, Semantics & contracts for a blocking map defined
- 
+ * @version 1.2, Semantics and contracts reviewed
+ * @version 1.1, Semantics and contracts for a blocking map defined
+ *
  */
 public interface BlockingMap<K, V> extends Map<K, V> {
 
@@ -100,12 +111,13 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * Returns the value to which the specified key is mapped, or {@code null}
      * if this map contains no mapping for the key.
      *
-     * <p> Note that {@code null} is used as a special marker to indicate the
+     * <p>
+     * Note that {@code null} is used as a special marker to indicate the
      * absence of the requested key
      *
      * @param key the key whose associated value is to be returned
-     * @return the value to which the specified key is mapped, or
-     *         {@code null} if this map contains no mapping for the key
+     * @return the value to which the specified key is mapped, or {@code null}
+     * if this map contains no mapping for the key
      * @throws ClassCastException if the key is of an inappropriate type for
      * this map (optional)
      * @throws NullPointerException if the specified key is null and this map
@@ -120,11 +132,13 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method returns with <tt>null</tt>. put on an unbound map will always
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method returns with <tt>null</tt>. put on an unbound map will always
      * succeed
      *
-     * <p> Producers cannot put on a key that is already available on the map.
+     * <p>
+     * Producers cannot put on a key that is already available on the map.
      * Attempts to put a mapping whose key is already available on the map are
      * ignored. However, the same mapping can be put in to the map after it is
      * taken by consumer(s)
@@ -145,17 +159,19 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * value prevents it from being stored in this map
      */
     @Override
-    V put(K key, V value); //TO_DO : How does consumer distinguish between success & space not available scenrio if null is returned in both cases
+    V put(K key, V value); //TO_DO : How does consumer distinguish between success and space not available scenrio if null is returned in both cases
     //This ambiguity does not arise in unbound queue
     //When BoundQueue is supported, this has to be addressed
 
     /**
      * Removes the mapping for a key from this map if it is present.
      *
-     * <p>Returns the value to which this map previously associated the key, or
+     * <p>
+     * Returns the value to which this map previously associated the key, or
      * <tt>null</tt> if the map contained no mapping for the key.
      *
-     * <p>The map will not contain a mapping for the specified key once the call
+     * <p>
+     * The map will not contain a mapping for the specified key once the call
      * returns.
      *
      * @param key key whose mapping is to be removed from the map
@@ -172,14 +188,16 @@ public interface BlockingMap<K, V> extends Map<K, V> {
     V remove(Object key);
 
     /**
-     * Associates the specified value with the specified key in this map. 
+     * Associates the specified value with the specified key in this map.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available. offer on an unbound map
-     * will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available. offer on an unbound map will
+     * always succeed
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -195,7 +213,7 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to this queue
      */
-    V offer(K key, V value) throws InterruptedException; //TO_DO : How would consumer differenciate between sucessful offer with no previous binding & failure due to space unavailability on a boundQueue??
+    V offer(K key, V value) throws InterruptedException; //TO_DO : How would consumer differenciate between sucessful offer with no previous binding and failure due to space unavailability on a boundQueue??
 //This ambiguity does not arise in unbound queue
 //When BoundQueue is supported, this has to be addressed
 
@@ -221,12 +239,14 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * map previously contained a mapping for the key, the old value is replaced
      * by the specified value.
      *
-     * <p> If the Map is bounded and there is no space to put the new mapping,
-     * this method blocks till space becomes available or the specified time
-     * elapses. offer on an unbound map will always succeed
+     * <p>
+     * If the Map is bounded and there is no space to put the new mapping, this
+     * method blocks till space becomes available or the specified time elapses.
+     * offer on an unbound map will always succeed
      *
-     * <p> Producers cannot offer a mapping on a key that is already available
-     * on the map. Attempts to such a mapping are ignored. However, the same
+     * <p>
+     * Producers cannot offer a mapping on a key that is already available on
+     * the map. Attempts to such a mapping are ignored. However, the same
      * mapping can be successfully offered after the existing mapping is taken
      * by consumer(s)
      *
@@ -248,13 +268,13 @@ public interface BlockingMap<K, V> extends Map<K, V> {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to this queue
      */
-    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException; //TO_DO : How does producer infer difference bet when success & timeout
+    V offer(K key, V value, long timeout, TimeUnit unit) throws InterruptedException; //TO_DO : How does producer infer difference bet when success and timeout
     //BlockingQueue in Java follows the same semantic, sticking to the same,for now.
 
     /**
      * Retrieves and removes the mapping for a key from this map if it is
      * present, waiting if necessary until the mapping becomes available or the
-     * specified time elapses. 
+     * specified time elapses.
      *
      *
      * @param key key with which the specified value is to be associated

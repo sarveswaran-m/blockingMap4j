@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * This is similar to unbounded buffer in which the synchronizer elements are
  * inserted by producers and extracted by consumers. The only twist is that each
- * product has a key & consumers know which product they are interested in.
+ * product has a key and consumers know which product they are interested in.
  * Attempts to <tt>put/offer</tt> an element into the map will always succeed
  * because this is an unbound map; attempts to <tt>take</tt>
  * element corresponding to a key that is not available on the map will block.
@@ -224,8 +224,8 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
     @Override
     public V offer(K key, V value) throws InterruptedException {
         /**
-         * TO_DO : How would consumer differenciate between successful offer with
-         * no previous binding & failure due to space unavailability on a
+         * TO_DO : How would consumer differenciate between successful offer
+         * with no previous binding & failure due to space unavailability on a
          * boundQueue?? This ambiguity does not arise in unbound queue When
          * BoundQueue is supported, this has to be addressed
          */
@@ -323,7 +323,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
     }
 
     /**
-     * Shuts down this blocking map & removes all mappings from this map.The map
+     * Shuts down this blocking map and removes all mappings from this map.The map
      * will be empty after this call.
      *
      * <p>
@@ -337,7 +337,7 @@ public class BlockingHashMap<K, V> implements BlockingMap<K, V> {
         //clear the map only if it has not been cleared yet
         if (!cleared.getAndSet(true)) {
             BlockingMap<K, V> oldState = state;
-            state = PassiveHashMap.<K,V>getInstance();
+            state = PassiveHashMap.<K, V>getInstance();
             oldState.clear();
         } else {
             state.clear();

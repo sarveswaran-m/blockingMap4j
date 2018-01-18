@@ -3,7 +3,7 @@
 
     <groupId>org.thavam.util.concurrent</groupId>
     <artifactId>blockingMap</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9</version>
     <packaging>jar</packaging>
 
     <name>blockingMap</name>
@@ -29,7 +29,8 @@
         <connection>scm:git:git://github.com/sarveswaran-m/blockingMap4j.git</connection>
         <developerConnection>scm:git:https://github.com/sarveswaran-m/blockingMap4j.git</developerConnection>
         <url>http://github.com/sarveswaran-m/blockingMap4j/tree/master</url>
-    </scm>
+      <tag>blockingMap-0.9</tag>
+  </scm>
     
     
     <distributionManagement>

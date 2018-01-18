@@ -27,7 +27,7 @@
     
     <scm>
         <connection>scm:git:git://github.com/sarveswaran-m/blockingMap4j.git</connection>
-        <developerConnection>scm:git:ssh://github.com/sarveswaran-m/blockingMap4j.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/sarveswaran-m/blockingMap4j.git</developerConnection>
         <url>http://github.com/sarveswaran-m/blockingMap4j/tree/master</url>
     </scm>
     

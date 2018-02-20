@@ -5,6 +5,10 @@
 Blocking map acts as a key-based synchronizer between producers and consumers in concurrent environment. It is a Map that additionally supports operations that wait for a key to be available when retrieving an element. There can be multiple producers populating & multiple consumers consuming from the same blocking map. BlockingMap is **thread-safe & highly-concurrent**.
 > **Note:**
 > - For now, only unbound map implementation supported
+> - Maven GAV co-ordinates: <br/>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<groupId\>com.github.sarveswaran-m\</groupId\><br/>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<artifactId\>util.concurrent.blockingMap\</artifactId\>
+
 
 ### 2. Why blockingMap4j? <a name="why"></a>
 In any concurrent environment with one or more producer(s) & consumer(s), synchronizer between the producers & consumers is required. A *Queue* is typically used as synchronizer. Java has many queue based synchronizers. The **BlockingQueue** interface with multiple implementations like *ArrayBlockingQueue, DelayQueue* etc are examples of queue based synchronizers in Java. 
